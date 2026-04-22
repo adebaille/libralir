@@ -4,7 +4,7 @@ node_modules/
 # Variables d'environnement
 .env
 .env.local
-
+back/.env
 # Fichiers système
 .DS_Store
 Thumbs.db
