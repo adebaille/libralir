@@ -51,4 +51,54 @@ class LibraryController
         $books = $this->libraryService->getUserLibrary($this->userId);
         echo json_encode(['books' => $books]);
     }
+
+    // Détail d'un livre de la bibliothèque
+    // GET /api/library/:id
+    public function show(array $params): void
+    {
+        $userBookId = (int) $params['id'];
+        $result = $this->libraryService->getBookFromLibrary($this->userId, $userBookId);
+
+        if (isset($result['error'])) {
+            http_response_code(404);
+        }
+
+        echo json_encode($result);
+    }
+
+    // Met à jour un livre de la bibliothèque
+    // PUT /api/library/:id
+    public function update(array $params): void
+    {
+        $userBookId = (int) $params['id'];
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        if (!is_array($data)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Corps de requête invalide']);
+            return;
+        }
+
+        $result = $this->libraryService->updateBookInLibrary($this->userId, $userBookId, $data);
+
+        if (isset($result['error'])) {
+            http_response_code(400);
+        }
+
+        echo json_encode($result);
+    }
+
+    // Retire un livre de la bibliothèque
+    // DELETE /api/library/:id
+    public function delete(array $params): void
+    {
+        $userBookId = (int) $params['id'];
+        $result = $this->libraryService->removeBookFromLibrary($this->userId, $userBookId);
+
+        if (isset($result['error'])) {
+            http_response_code(404);
+        }
+
+        echo json_encode($result);
+    }
 }

@@ -74,4 +74,64 @@ class UserBookModel extends BaseModel
         $stmt->execute([':user_id' => $userId]);
         return $stmt->fetchAll();
     }
+
+    // -------------------------------------------------------------------------
+    // FIND BY ID AND USER
+    // Récupère une entrée user_books par son id, en vérifiant que
+    // l'entrée appartient bien à l'user (sécurité)
+    // -------------------------------------------------------------------------
+    public function findByIdAndUser(int $userBookId, int $userId): array|false
+    {
+        $stmt = $this->db->prepare('
+            SELECT
+                ub.id AS user_book_id,
+                ub.status,
+                ub.current_page,
+                ub.created_at,
+                b.id AS book_id,
+                b.title,
+                b.author,
+                b.total_pages,
+                b.thumbnail_url
+            FROM user_books ub
+            INNER JOIN books b ON b.id = ub.book_id
+            WHERE ub.id = :user_book_id AND ub.user_id = :user_id
+        ');
+        $stmt->execute([
+            ':user_book_id' => $userBookId,
+            ':user_id'      => $userId,
+        ]);
+        return $stmt->fetch();
+    }
+
+    // -------------------------------------------------------------------------
+    // UPDATE
+    // Met à jour le statut et/ou la progression d'une lecture
+    // -------------------------------------------------------------------------
+    public function update(int $userBookId, string $status, int $currentPage): bool
+    {
+        $stmt = $this->db->prepare('
+            UPDATE user_books
+            SET status       = :status,
+                current_page = :current_page,
+                updated_at   = CURRENT_TIMESTAMP
+            WHERE id = :id
+        ');
+
+        return $stmt->execute([
+            ':id'           => $userBookId,
+            ':status'       => $status,
+            ':current_page' => $currentPage,
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // DELETE
+    // Retire un livre de la bibliothèque
+    // -------------------------------------------------------------------------
+    public function delete(int $userBookId): bool
+    {
+        $stmt = $this->db->prepare('DELETE FROM user_books WHERE id = :id');
+        return $stmt->execute([':id' => $userBookId]);
+    }
 }
