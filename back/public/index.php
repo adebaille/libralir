@@ -7,6 +7,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use App\Database\Connection;
 use App\Router;
 use App\Controllers\AuthController;
+use App\Middlewares\AuthMiddleware;
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: http://localhost:5173');
@@ -25,6 +26,14 @@ $router->post('/api/auth/register', function () {
 
 $router->post('/api/auth/login', function () {
     (new AuthController())->login();
+});
+
+$router->get('/api/me', function () {
+    $user = AuthMiddleware::check();
+    echo json_encode([
+        'user_id' => $user['user_id'],
+        'email'   => $user['email'],
+    ]);
 });
 
 $router->dispatch(
