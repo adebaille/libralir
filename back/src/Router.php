@@ -8,7 +8,6 @@ class Router
 {
     private array $routes = [];
 
-    // Raccourcis par méthode HTTP
     public function get(string $path, callable $handler): void
     {
         $this->addRoute('GET', $path, $handler);
@@ -31,20 +30,42 @@ class Router
 
     private function addRoute(string $method, string $path, callable $handler): void
     {
-        $this->routes[$method][$path] = $handler;
+        $this->routes[$method][] = [
+            'path'    => $path,
+            'handler' => $handler,
+        ];
     }
 
     public function dispatch(string $method, string $uri): void
     {
-        // On ignore les paramètres d'URL (?foo=bar)
         $path = parse_url($uri, PHP_URL_PATH);
 
-        if (isset($this->routes[$method][$path])) {
-            call_user_func($this->routes[$method][$path]);
-            return;
+        foreach ($this->routes[$method] ?? [] as $route) {
+            $params = $this->match($route['path'], $path);
+
+            if ($params !== null) {
+                call_user_func($route['handler'], $params);
+                return;
+            }
         }
 
         http_response_code(404);
         echo json_encode(['error' => 'Route not found']);
+    }
+
+    // Compare un pattern (ex: /api/books/:id) à une URL réelle (ex: /api/books/42)
+    // Retourne les paramètres extraits ou null si pas de correspondance
+    private function match(string $pattern, string $path): ?array
+    {
+        // Transforme ":id" en groupe de capture nommé regex
+        $regex = preg_replace('#:([a-zA-Z]+)#', '(?<$1>[^/]+)', $pattern);
+        $regex = '#^' . $regex . '$#';
+
+        if (!preg_match($regex, $path, $matches)) {
+            return null;
+        }
+
+        // On ne garde que les captures nommées (pas les index numériques)
+        return array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
     }
 }
