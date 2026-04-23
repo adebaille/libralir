@@ -50,6 +50,18 @@ $router->get('/api/library', function () {
     (new LibraryController())->list();
 });
 
+$router->get('/api/library/:id', function ($params) {
+    (new LibraryController())->show($params);
+});
+
+$router->put('/api/library/:id', function ($params) {
+    (new LibraryController())->update($params);
+});
+
+$router->delete('/api/library/:id', function ($params) {
+    (new LibraryController())->delete($params);
+});
+
 $router->dispatch(
     $_SERVER['REQUEST_METHOD'],
     $_SERVER['REQUEST_URI']

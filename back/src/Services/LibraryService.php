@@ -71,4 +71,59 @@ class LibraryService
     {
         return $this->userBookModel->findAllByUser($userId);
     }
+
+    // Récupère un livre précis de la bibliothèque
+    public function getBookFromLibrary(int $userId, int $userBookId): array
+    {
+        $book = $this->userBookModel->findByIdAndUser($userBookId, $userId);
+
+        if (!$book) {
+            return ['error' => 'Livre introuvable dans votre bibliothèque'];
+        }
+
+        return ['book' => $book];
+    }
+
+    // Met à jour le statut et/ou la progression
+    public function updateBookInLibrary(int $userId, int $userBookId, array $data): array
+    {
+        $book = $this->userBookModel->findByIdAndUser($userBookId, $userId);
+
+        if (!$book) {
+            return ['error' => 'Livre introuvable dans votre bibliothèque'];
+        }
+
+        // Validation du statut si fourni
+        $validStatuses = ['to_read', 'in_progress', 'completed', 'paused', 'abandoned'];
+        $status = $data['status'] ?? $book['status'];
+
+        if (!in_array($status, $validStatuses, true)) {
+            return ['error' => 'Statut invalide'];
+        }
+
+        // Validation de la progression si fournie
+        $currentPage = isset($data['current_page']) ? (int) $data['current_page'] : $book['current_page'];
+
+        if ($currentPage < 0 || $currentPage > $book['total_pages']) {
+            return ['error' => 'Page actuelle invalide'];
+        }
+
+        $this->userBookModel->update($userBookId, $status, $currentPage);
+
+        return ['message' => 'Lecture mise à jour'];
+    }
+
+    // Retire un livre de la bibliothèque
+    public function removeBookFromLibrary(int $userId, int $userBookId): array
+    {
+        $book = $this->userBookModel->findByIdAndUser($userBookId, $userId);
+
+        if (!$book) {
+            return ['error' => 'Livre introuvable dans votre bibliothèque'];
+        }
+
+        $this->userBookModel->delete($userBookId);
+
+        return ['message' => 'Livre retiré de votre bibliothèque'];
+    }
 }
