@@ -1,0 +1,77 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+// UserBookModel gère la table user_books
+// Chaque ligne = un livre dans la bibliothèque d'un utilisateur
+// Contient le statut de lecture et la progression
+class UserBookModel extends BaseModel
+{
+    protected string $table = 'user_books';
+
+    // -------------------------------------------------------------------------
+    // FIND BY USER AND BOOK
+    // Vérifie si un user a déjà ce livre dans sa bibliothèque
+    // Utile pour éviter les doublons à l'ajout
+    // -------------------------------------------------------------------------
+    public function findByUserAndBook(int $userId, int $bookId): array|false
+    {
+        $stmt = $this->db->prepare('
+            SELECT * FROM user_books
+            WHERE user_id = :user_id AND book_id = :book_id
+        ');
+        $stmt->execute([
+            ':user_id' => $userId,
+            ':book_id' => $bookId,
+        ]);
+        return $stmt->fetch();
+    }
+
+    // -------------------------------------------------------------------------
+    // CREATE
+    // Ajoute un livre à la bibliothèque d'un utilisateur
+    // Par défaut : status 'to_read', current_page 0
+    // -------------------------------------------------------------------------
+    public function create(int $userId, int $bookId, string $status = 'to_read'): bool
+    {
+        $stmt = $this->db->prepare('
+            INSERT INTO user_books (user_id, book_id, status)
+            VALUES (:user_id, :book_id, :status)
+        ');
+
+        return $stmt->execute([
+            ':user_id' => $userId,
+            ':book_id' => $bookId,
+            ':status'  => $status,
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // FIND ALL BY USER
+    // Récupère tous les livres de la bibliothèque d'un utilisateur
+    // On joint avec books pour avoir titre, auteur, couverture, etc.
+    // -------------------------------------------------------------------------
+    public function findAllByUser(int $userId): array
+    {
+        $stmt = $this->db->prepare('
+            SELECT
+                ub.id AS user_book_id,
+                ub.status,
+                ub.current_page,
+                ub.created_at,
+                b.id AS book_id,
+                b.title,
+                b.author,
+                b.total_pages,
+                b.thumbnail_url
+            FROM user_books ub
+            INNER JOIN books b ON b.id = ub.book_id
+            WHERE ub.user_id = :user_id
+            ORDER BY ub.created_at DESC
+        ');
+        $stmt->execute([':user_id' => $userId]);
+        return $stmt->fetchAll();
+    }
+}

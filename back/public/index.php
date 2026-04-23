@@ -9,6 +9,7 @@ use App\Router;
 use App\Controllers\AuthController;
 use App\Middlewares\AuthMiddleware;
 use App\Controllers\BookController;
+use App\Controllers\LibraryController;
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: http://localhost:5173');
@@ -39,6 +40,14 @@ $router->get('/api/me', function () {
 
 $router->get('/api/books/search', function () {
     (new BookController())->search();
+});
+
+$router->post('/api/library', function () {
+    (new LibraryController())->add();
+});
+
+$router->get('/api/library', function () {
+    (new LibraryController())->list();
 });
 
 $router->dispatch(

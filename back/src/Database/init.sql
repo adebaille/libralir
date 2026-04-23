@@ -15,12 +15,16 @@ CREATE TABLE users (
 
 -- 2. BOOKS (catalogue partagé, aucun propriétaire)
 CREATE TABLE books (
-    id          INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    title       VARCHAR(255) NOT NULL,
-    author      VARCHAR(255),
-    total_pages INT NOT NULL,
-    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT chk_books_total_pages CHECK (total_pages > 0)
+    id              INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    title           VARCHAR(255) NOT NULL,
+    author          VARCHAR(255),
+    total_pages     INT NOT NULL,
+    google_books_id VARCHAR(50),
+    isbn_13         VARCHAR(13),
+    thumbnail_url   TEXT,
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_books_total_pages CHECK (total_pages > 0),
+    CONSTRAINT uq_books_google_books_id UNIQUE (google_books_id)
 );
 
 -- 3. CATEGORIES
