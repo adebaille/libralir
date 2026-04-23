@@ -4,58 +4,42 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Database\Connection;
+use App\Models\UserModel;
 use Firebase\JWT\JWT;
-use PDO;
 
 class AuthService
 {
-    private PDO $pdo;
+    private UserModel $userModel;
     private string $jwtSecret;
 
     public function __construct()
     {
-        $this->pdo       = Connection::getInstance();
+        $this->userModel = new UserModel();
         $this->jwtSecret = $_ENV['JWT_SECRET'] ?? 'default_secret';
     }
 
+    // Inscription : vérifie l'unicité de l'email, hash le mot de passe, crée l'utilisateur
     public function register(string $email, string $password): array
     {
-        // Vérifie si l'email existe déjà
-        $stmt = $this->pdo->prepare('SELECT id FROM users WHERE email = :email');
-        $stmt->execute([':email' => $email]);
-
-        if ($stmt->fetch()) {
+        if ($this->userModel->findByEmail($email)) {
             return ['error' => 'Cet email est déjà utilisé'];
         }
 
-        // Hash du mot de passe
         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
-
-        // Insertion en BDD
-        $stmt = $this->pdo->prepare(
-            'INSERT INTO users (email, password_hash) VALUES (:email, :password_hash)'
-        );
-        $stmt->execute([
-            ':email'         => $email,
-            ':password_hash' => $passwordHash,
-        ]);
+        $this->userModel->create($email, $passwordHash);
 
         return ['message' => 'Inscription réussie'];
     }
 
+    // Connexion : vérifie le mot de passe et génère un JWT
     public function login(string $email, string $password): array
     {
-        // Récupère l'utilisateur
-        $stmt = $this->pdo->prepare('SELECT id, password_hash FROM users WHERE email = :email');
-        $stmt->execute([':email' => $email]);
-        $user = $stmt->fetch();
+        $user = $this->userModel->findByEmail($email);
 
         if (!$user || !password_verify($password, $user['password_hash'])) {
             return ['error' => 'Email ou mot de passe incorrect'];
         }
 
-        // Génère le JWT
         $payload = [
             'user_id' => $user['id'],
             'email'   => $email,

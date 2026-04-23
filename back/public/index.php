@@ -7,6 +7,8 @@ require_once __DIR__ . '/../src/Database/Connection.php';
 require_once __DIR__ . '/../src/Router.php';
 require_once __DIR__ . '/../src/Controllers/AuthController.php';
 require_once __DIR__ . '/../src/Services/AuthService.php';
+require_once __DIR__ . '/../src/Models/BaseModel.php';
+require_once __DIR__ . '/../src/Models/UserModel.php';
 
 use App\Database\Connection;
 use App\Router;
