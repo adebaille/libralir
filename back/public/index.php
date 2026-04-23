@@ -8,6 +8,7 @@ use App\Database\Connection;
 use App\Router;
 use App\Controllers\AuthController;
 use App\Middlewares\AuthMiddleware;
+use App\Controllers\BookController;
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: http://localhost:5173');
@@ -34,6 +35,10 @@ $router->get('/api/me', function () {
         'user_id' => $user['user_id'],
         'email'   => $user['email'],
     ]);
+});
+
+$router->get('/api/books/search', function () {
+    (new BookController())->search();
 });
 
 $router->dispatch(
