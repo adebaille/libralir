@@ -60,7 +60,7 @@ class UserBookModel extends BaseModel
         ?string $title = null,
         string $orderBy = 'created_at_desc'
     ): array {
-        $sql = '
+        $sql = "
             SELECT
                 ub.id AS user_book_id,
                 ub.status,
@@ -70,11 +70,18 @@ class UserBookModel extends BaseModel
                 b.title,
                 b.author,
                 b.total_pages,
-                b.thumbnail_url
+                b.thumbnail_url,
+                COALESCE(
+                    (SELECT array_agg(c.name)
+                     FROM book_categories bc
+                     INNER JOIN categories c ON c.id = bc.category_id
+                     WHERE bc.book_id = b.id),
+                    ARRAY[]::VARCHAR[]
+                ) AS categories
             FROM user_books ub
             INNER JOIN books b ON b.id = ub.book_id
             WHERE ub.user_id = :user_id
-        ';
+        ";
         $params = [':user_id' => $userId];
 
         // Filtre par statut (égalité exacte)
@@ -105,9 +112,29 @@ class UserBookModel extends BaseModel
             default           => ' ORDER BY ub.created_at DESC',
         };
 
-        $stmt = $this->db->prepare($sql);
+       $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
-        return $stmt->fetchAll();
+        $rows = $stmt->fetchAll();
+
+        // Convertit le format PostgreSQL "{\"a\",\"b\"}" en tableau PHP
+        foreach ($rows as &$row) {
+            $row['categories'] = $this->parsePgArray($row['categories']);
+        }
+
+        return $rows;
+    }
+
+    // Parse le format de tableau PostgreSQL (ex: {"Fantasy","Aventure"}) en tableau PHP
+    private function parsePgArray(?string $pgArray): array
+    {
+        if ($pgArray === null || $pgArray === '{}') {
+            return [];
+        }
+
+        // Retire les accolades et split sur les virgules
+        $content = trim($pgArray, '{}');
+        $items = str_getcsv($content, ',', '"', '\\');
+        return array_map(fn($item) => trim($item), $items);
     }
 
     // -------------------------------------------------------------------------
@@ -127,7 +154,14 @@ class UserBookModel extends BaseModel
                 b.title,
                 b.author,
                 b.total_pages,
-                b.thumbnail_url
+                b.thumbnail_url,
+                COALESCE(
+                    (SELECT array_agg(c.name)
+                     FROM book_categories bc
+                     INNER JOIN categories c ON c.id = bc.category_id
+                     WHERE bc.book_id = b.id),
+                    ARRAY[]::VARCHAR[]
+                ) AS categories
             FROM user_books ub
             INNER JOIN books b ON b.id = ub.book_id
             WHERE ub.id = :user_book_id AND ub.user_id = :user_id
@@ -136,7 +170,15 @@ class UserBookModel extends BaseModel
             ':user_book_id' => $userBookId,
             ':user_id'      => $userId,
         ]);
-        return $stmt->fetch();
+
+        $row = $stmt->fetch();
+
+        if ($row === false) {
+            return false;
+        }
+
+        $row['categories'] = $this->parsePgArray($row['categories']);
+        return $row;
     }
 
     // -------------------------------------------------------------------------

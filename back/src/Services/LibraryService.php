@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\BookModel;
 use App\Models\UserBookModel;
+use App\Models\CategoryModel;
 
 // LibraryService gère la logique d'ajout d'un livre à la bibliothèque d'un user
 // Logique en 2 temps : on s'assure que le livre existe dans le catalogue,
@@ -14,11 +15,13 @@ class LibraryService
 {
     private BookModel $bookModel;
     private UserBookModel $userBookModel;
+    private CategoryModel $categoryModel;
 
     public function __construct()
     {
         $this->bookModel     = new BookModel();
         $this->userBookModel = new UserBookModel();
+        $this->categoryModel = new CategoryModel();
     }
 
     // Ajoute un livre (issu de Google Books) à la bibliothèque d'un user
@@ -51,6 +54,14 @@ class LibraryService
                 $bookData['isbn_13'] ?? null,
                 $bookData['thumbnail'] ?? null
             );
+
+            // Enregistrer les catégories (uniquement pour un livre nouvellement créé)
+            if (!empty($bookData['categories']) && is_array($bookData['categories'])) {
+                foreach ($bookData['categories'] as $categoryName) {
+                    $categoryId = $this->categoryModel->findOrCreate($categoryName);
+                    $this->categoryModel->attachToBook($bookId, $categoryId);
+                }
+            }
         } else {
             $bookId = (int) $book['id'];
         }
