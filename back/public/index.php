@@ -10,6 +10,7 @@ use App\Controllers\AuthController;
 use App\Middlewares\AuthMiddleware;
 use App\Controllers\BookController;
 use App\Controllers\LibraryController;
+use App\Controllers\ReadingSessionController;
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: http://localhost:5173');
@@ -34,7 +35,7 @@ $router->get('/api/me', function () {
     $user = AuthMiddleware::check();
     echo json_encode([
         'user_id' => $user['user_id'],
-        'email'   => $user['email'],
+        'email' => $user['email'],
     ]);
 });
 
@@ -60,6 +61,18 @@ $router->put('/api/library/:id', function ($params) {
 
 $router->delete('/api/library/:id', function ($params) {
     (new LibraryController())->delete($params);
+});
+
+$router->post('/api/library/:id/sessions', function ($params) {
+    (new ReadingSessionController())->create($params);
+});
+
+$router->get('/api/library/:id/sessions', function ($params) {
+    (new ReadingSessionController())->listByBook($params);
+});
+
+$router->get('/api/sessions', function () {
+    (new ReadingSessionController())->listAll();
 });
 
 $router->dispatch(
