@@ -44,6 +44,7 @@ class GoogleBooksService
             'page_count'      => $info['pageCount'] ?? null,
             'isbn_13'         => $this->extractIsbn($info['industryIdentifiers'] ?? [], 'ISBN_13'),
             'thumbnail'       => $info['imageLinks']['thumbnail'] ?? null,
+            'categories'      => $info['categories'] ?? [],  // ← ajouté
         ];
     }
 
