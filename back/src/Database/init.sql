@@ -68,18 +68,15 @@ CREATE TABLE user_books (
 -- 6. READING_SESSIONS
 CREATE TABLE reading_sessions (
     id               INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id          INT NOT NULL,
-    book_id          INT NOT NULL,
+    user_book_id     INT NOT NULL,
     pages_read       INT NOT NULL,
     session_date     DATE NOT NULL DEFAULT CURRENT_DATE,
     duration_minutes INT,
     created_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT chk_reading_sessions_pages CHECK (pages_read > 0),
     CONSTRAINT chk_reading_sessions_duration CHECK (duration_minutes > 0),
-    CONSTRAINT fk_reading_sessions_user_id FOREIGN KEY (user_id)
-        REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_reading_sessions_book_id FOREIGN KEY (book_id)
-        REFERENCES books(id) ON DELETE CASCADE
+    CONSTRAINT fk_reading_sessions_user_book_id FOREIGN KEY (user_book_id)
+        REFERENCES user_books(id) ON DELETE CASCADE
 );
 
 -- 7. BADGES
