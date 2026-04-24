@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\UserModel;
 use Firebase\JWT\JWT;
+use App\Database\Connection;
 
 class AuthService
 {
@@ -49,5 +50,33 @@ class AuthService
         $token = JWT::encode($payload, $this->jwtSecret, 'HS256');
 
         return ['token' => $token];
+    }
+
+    // Supprime définitivement le compte utilisateur
+    // Requiert la confirmation par mot de passe
+    // Grâce au ON DELETE CASCADE, toutes les données liées sont supprimées
+    public function deleteAccount(int $userId, string $password): array
+    {
+        $user = $this->userModel->findById($userId);
+
+        if (!$user) {
+            return ['error' => 'Utilisateur introuvable'];
+        }
+
+        if (!password_verify($password, $user['password_hash'])) {
+            return ['error' => 'Mot de passe incorrect'];
+        }
+
+        $pdo = Connection::getInstance();
+        $pdo->beginTransaction();
+
+        try {
+            $this->userModel->delete($userId);
+            $pdo->commit();
+            return ['message' => 'Compte supprimé'];
+        } catch (\Exception $e) {
+            $pdo->rollBack();
+            return ['error' => 'Erreur lors de la suppression'];
+        }
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Services\AuthService;
+use App\Middlewares\AuthMiddleware;
 
 class AuthController
 {
@@ -48,6 +49,30 @@ class AuthController
         }
 
         $result = $this->authService->login($data['email'], $data['password']);
+
+        if (isset($result['error'])) {
+            http_response_code(401);
+        }
+
+        echo json_encode($result);
+    }
+
+    // Supprime le compte de l'utilisateur connecté
+    // DELETE /api/account
+    public function deleteAccount(): void
+    {
+        $user   = AuthMiddleware::check();
+        $userId = (int) $user['user_id'];
+
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        if (!is_array($data) || empty($data['password'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Mot de passe requis pour confirmer la suppression']);
+            return;
+        }
+
+        $result = $this->authService->deleteAccount($userId, $data['password']);
 
         if (isset($result['error'])) {
             http_response_code(401);
