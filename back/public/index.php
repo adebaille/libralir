@@ -11,6 +11,7 @@ use App\Middlewares\AuthMiddleware;
 use App\Controllers\BookController;
 use App\Controllers\LibraryController;
 use App\Controllers\ReadingSessionController;
+use App\Controllers\MonthlyChallengeController;
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: http://localhost:5173');
@@ -77,6 +78,22 @@ $router->get('/api/sessions', function () {
 
 $router->delete('/api/account', function () {
     (new AuthController())->deleteAccount();
+});
+
+$router->post('/api/challenges', function () {
+    (new MonthlyChallengeController())->create();
+});
+
+$router->get('/api/challenges', function () {
+    (new MonthlyChallengeController())->listByMonth();
+});
+
+$router->put('/api/challenges/:id', function ($params) {
+    (new MonthlyChallengeController())->update($params);
+});
+
+$router->delete('/api/challenges/:id', function ($params) {
+    (new MonthlyChallengeController())->delete($params);
 });
 
 $router->dispatch(
