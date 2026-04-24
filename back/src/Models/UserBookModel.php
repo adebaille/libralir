@@ -154,7 +154,14 @@ class UserBookModel extends BaseModel
                 b.title,
                 b.author,
                 b.total_pages,
-                b.thumbnail_url
+                b.thumbnail_url,
+                COALESCE(
+                    (SELECT array_agg(c.name)
+                     FROM book_categories bc
+                     INNER JOIN categories c ON c.id = bc.category_id
+                     WHERE bc.book_id = b.id),
+                    ARRAY[]::VARCHAR[]
+                ) AS categories
             FROM user_books ub
             INNER JOIN books b ON b.id = ub.book_id
             WHERE ub.id = :user_book_id AND ub.user_id = :user_id
@@ -163,7 +170,15 @@ class UserBookModel extends BaseModel
             ':user_book_id' => $userBookId,
             ':user_id'      => $userId,
         ]);
-        return $stmt->fetch();
+
+        $row = $stmt->fetch();
+
+        if ($row === false) {
+            return false;
+        }
+
+        $row['categories'] = $this->parsePgArray($row['categories']);
+        return $row;
     }
 
     // -------------------------------------------------------------------------
