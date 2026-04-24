@@ -48,14 +48,19 @@ class UserBookModel extends BaseModel
         ]);
     }
 
-    // -------------------------------------------------------------------------
+   // -------------------------------------------------------------------------
     // FIND ALL BY USER
-    // Récupère tous les livres de la bibliothèque d'un utilisateur
-    // On joint avec books pour avoir titre, auteur, couverture, etc.
+    // Récupère les livres de la bibliothèque d'un user, avec filtres optionnels
+    // Chaque filtre est optionnel : si absent, on ne l'applique pas
     // -------------------------------------------------------------------------
-    public function findAllByUser(int $userId): array
-    {
-        $stmt = $this->db->prepare('
+    public function findAllByUser(
+        int $userId,
+        ?string $status = null,
+        ?string $author = null,
+        ?string $title = null,
+        string $orderBy = 'created_at_desc'
+    ): array {
+        $sql = '
             SELECT
                 ub.id AS user_book_id,
                 ub.status,
@@ -69,9 +74,39 @@ class UserBookModel extends BaseModel
             FROM user_books ub
             INNER JOIN books b ON b.id = ub.book_id
             WHERE ub.user_id = :user_id
-            ORDER BY ub.created_at DESC
-        ');
-        $stmt->execute([':user_id' => $userId]);
+        ';
+        $params = [':user_id' => $userId];
+
+        // Filtre par statut (égalité exacte)
+        if ($status !== null && $status !== '') {
+            $sql .= ' AND ub.status = :status';
+            $params[':status'] = $status;
+        }
+
+        // Filtre par auteur (recherche partielle insensible à la casse)
+        if ($author !== null && $author !== '') {
+            $sql .= ' AND b.author ILIKE :author';
+            $params[':author'] = '%' . $author . '%';
+        }
+
+        // Filtre par titre (recherche partielle insensible à la casse)
+        if ($title !== null && $title !== '') {
+            $sql .= ' AND b.title ILIKE :title';
+            $params[':title'] = '%' . $title . '%';
+        }
+
+        // Tri — on utilise match() pour éviter l'injection SQL dans ORDER BY
+        $sql .= match ($orderBy) {
+            'title_asc'       => ' ORDER BY b.title ASC',
+            'title_desc'      => ' ORDER BY b.title DESC',
+            'author_asc'      => ' ORDER BY b.author ASC',
+            'author_desc'     => ' ORDER BY b.author DESC',
+            'created_at_asc'  => ' ORDER BY ub.created_at ASC',
+            default           => ' ORDER BY ub.created_at DESC',
+        };
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 

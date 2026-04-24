@@ -66,10 +66,16 @@ class LibraryService
         return ['message' => 'Livre ajouté à votre bibliothèque'];
     }
 
-    // Récupère la bibliothèque d'un user
-    public function getUserLibrary(int $userId): array
+    // Récupère la bibliothèque d'un user avec filtres optionnels
+    public function getUserLibrary(int $userId, array $filters = []): array
     {
-        return $this->userBookModel->findAllByUser($userId);
+        return $this->userBookModel->findAllByUser(
+            $userId,
+            $filters['status']   ?? null,
+            $filters['author']   ?? null,
+            $filters['title']    ?? null,
+            $filters['order_by'] ?? 'created_at_desc'
+        );
     }
 
     // Récupère un livre précis de la bibliothèque
