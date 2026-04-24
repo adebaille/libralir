@@ -44,11 +44,18 @@ class LibraryController
         echo json_encode($result);
     }
 
-    // Liste la bibliothèque de l'user
-    // GET /api/library
+    // Liste la bibliothèque de l'user avec filtres optionnels
+    // GET /api/library?status=...&author=...&title=...&order_by=...
     public function list(): void
     {
-        $books = $this->libraryService->getUserLibrary($this->userId);
+        $filters = [
+            'status'   => $_GET['status']   ?? null,
+            'author'   => $_GET['author']   ?? null,
+            'title'    => $_GET['title']    ?? null,
+            'order_by' => $_GET['order_by'] ?? null,
+        ];
+
+        $books = $this->libraryService->getUserLibrary($this->userId, $filters);
         echo json_encode(['books' => $books]);
     }
 
