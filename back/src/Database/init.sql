@@ -102,26 +102,22 @@ CREATE TABLE user_badges (
         REFERENCES badges(id) ON DELETE CASCADE
 );
 
--- 9. MONTHLY_CHALLENGES
-CREATE TABLE monthly_challenges (
-    id           INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    month        INT NOT NULL,
-    year         INT NOT NULL,
-    target_pages INT NOT NULL,
-    CONSTRAINT chk_monthly_challenges_month CHECK (month BETWEEN 1 AND 12),
-    CONSTRAINT uq_monthly_challenges_month_year UNIQUE (month, year)
-);
-
--- 10. USER_MONTHLY_CHALLENGES
+-- 9. USER_MONTHLY_CHALLENGES (objectif mensuel personnel)
 CREATE TABLE user_monthly_challenges (
-    id           INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id      INT NOT NULL,
-    challenge_id INT NOT NULL,
-    pages_read   INT NOT NULL DEFAULT 0,
-    is_completed BOOLEAN NOT NULL DEFAULT FALSE,
-    CONSTRAINT uq_user_monthly_challenges UNIQUE (user_id, challenge_id),
+    id             INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id        INT NOT NULL,
+    month          INT NOT NULL,
+    year           INT NOT NULL,
+    challenge_type VARCHAR(50) NOT NULL,
+    target_value   INT NOT NULL,
+    created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_user_monthly_challenges_month CHECK (month BETWEEN 1 AND 12),
+    CONSTRAINT chk_user_monthly_challenges_type CHECK (
+        challenge_type IN ('pages_read', 'books_completed', 'genres_read')
+    ),
+    CONSTRAINT chk_user_monthly_challenges_target CHECK (target_value > 0),
+    CONSTRAINT uq_user_monthly_challenges_user_month_type UNIQUE (user_id, month, year, challenge_type),
     CONSTRAINT fk_user_monthly_challenges_user_id FOREIGN KEY (user_id)
-        REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_user_monthly_challenges_challenge_id FOREIGN KEY (challenge_id)
-        REFERENCES monthly_challenges(id) ON DELETE CASCADE
+        REFERENCES users(id) ON DELETE CASCADE
 );
