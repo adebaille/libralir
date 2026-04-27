@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\BookModel;
 use App\Models\UserBookModel;
 use App\Models\CategoryModel;
+use App\Services\BadgeService;
 
 // LibraryService gère la logique d'ajout d'un livre à la bibliothèque d'un user
 // Logique en 2 temps : on s'assure que le livre existe dans le catalogue,
@@ -16,12 +17,14 @@ class LibraryService
     private BookModel $bookModel;
     private UserBookModel $userBookModel;
     private CategoryModel $categoryModel;
+    private BadgeService $badgeService;
 
     public function __construct()
     {
         $this->bookModel     = new BookModel();
         $this->userBookModel = new UserBookModel();
         $this->categoryModel = new CategoryModel();
+        $this->badgeService = new BadgeService();
     }
 
     // Ajoute un livre (issu de Google Books) à la bibliothèque d'un user
@@ -73,8 +76,12 @@ class LibraryService
 
         // Étape 3 : ajouter à la bibliothèque
         $this->userBookModel->create($userId, $bookId);
+        $newBadges = $this->badgeService->checkAndAwardBadges($userId);
 
-        return ['message' => 'Livre ajouté à votre bibliothèque'];
+        return [
+            'message'    => 'Livre ajouté à votre bibliothèque',
+            'new_badges' => $newBadges,
+        ];
     }
 
     // Récupère la bibliothèque d'un user avec filtres optionnels
@@ -127,8 +134,12 @@ class LibraryService
         }
 
         $this->userBookModel->update($userBookId, $status, $currentPage);
+        $newBadges = $this->badgeService->checkAndAwardBadges($userId);
 
-        return ['message' => 'Lecture mise à jour'];
+        return [
+            'message'    => 'Lecture mise à jour',
+            'new_badges' => $newBadges,
+        ];
     }
 
     // Retire un livre de la bibliothèque

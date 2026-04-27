@@ -121,3 +121,18 @@ CREATE TABLE user_monthly_challenges (
     CONSTRAINT fk_user_monthly_challenges_user_id FOREIGN KEY (user_id)
         REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- ============================================
+-- SEED : badges de base
+-- ============================================
+INSERT INTO badges (name, description, condition_type, condition_value) VALUES
+    ('Premier pas', 'Ajouter votre premier livre à la bibliothèque', 'books_added', 1),
+    ('Bibliothécaire', 'Avoir 10 livres dans votre bibliothèque', 'books_added', 10),
+    ('Collectionneur', 'Avoir 50 livres dans votre bibliothèque', 'books_added', 50),
+    ('Première lecture', 'Terminer votre premier livre', 'books_completed', 1),
+    ('Lecteur régulier', 'Terminer 10 livres', 'books_completed', 10),
+    ('Dévoreur', 'Terminer 50 livres', 'books_completed', 50),
+    ('Marathonien', 'Lire 1000 pages au total', 'total_pages', 1000),
+    ('Insatiable', 'Lire 10000 pages au total', 'total_pages', 10000),
+    ('Habitué', 'Enregistrer 10 sessions de lecture', 'sessions_count', 10),
+    ('Assidu', 'Enregistrer 100 sessions de lecture', 'sessions_count', 100);
