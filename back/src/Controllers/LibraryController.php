@@ -52,6 +52,7 @@ class LibraryController
             'status'   => $_GET['status']   ?? null,
             'author'   => $_GET['author']   ?? null,
             'title'    => $_GET['title']    ?? null,
+            'category' => $_GET['category'] ?? null,
             'order_by' => $_GET['order_by'] ?? null,
         ];
 

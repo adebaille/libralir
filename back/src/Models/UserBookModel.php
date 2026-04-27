@@ -58,6 +58,7 @@ class UserBookModel extends BaseModel
         ?string $status = null,
         ?string $author = null,
         ?string $title = null,
+        ?string $category = null,
         string $orderBy = 'created_at_desc'
     ): array {
         $sql = "
@@ -100,6 +101,16 @@ class UserBookModel extends BaseModel
         if ($title !== null && $title !== '') {
             $sql .= ' AND b.title ILIKE :title';
             $params[':title'] = '%' . $title . '%';
+        }
+
+        // Filtre par catégorie (recherche partielle insensible à la casse)
+        if ($category !== null && $category !== '') {
+            $sql .= ' AND EXISTS (
+                SELECT 1 FROM book_categories bc
+                INNER JOIN categories c ON c.id = bc.category_id
+                WHERE bc.book_id = b.id AND c.name ILIKE :category
+            )';
+            $params[':category'] = '%' . $category . '%';
         }
 
         // Tri — on utilise match() pour éviter l'injection SQL dans ORDER BY
