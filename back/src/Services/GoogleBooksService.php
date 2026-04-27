@@ -58,4 +58,10 @@ class GoogleBooksService
         }
         return null;
     }
+
+    // Recherche des livres par catégorie via le paramètre subject de Google Books
+    public function searchByCategory(string $category, int $maxResults = 10): array
+    {
+        return $this->search('subject:' . $category, $maxResults);
+    }
 }
