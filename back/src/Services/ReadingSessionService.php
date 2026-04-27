@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\ReadingSessionModel;
 use App\Models\UserBookModel;
+use App\Services\BadgeService;
 
 // ReadingSessionService gère la logique des sessions de lecture
 // Important : créer une session met automatiquement à jour la progression (current_page)
@@ -13,11 +14,13 @@ class ReadingSessionService
 {
     private ReadingSessionModel $sessionModel;
     private UserBookModel $userBookModel;
+    private BadgeService $badgeService;
 
     public function __construct()
     {
         $this->sessionModel  = new ReadingSessionModel();
         $this->userBookModel = new UserBookModel();
+        $this->badgeService = new BadgeService();
     }
 
     // Enregistre une session de lecture et met à jour la progression du livre
@@ -67,11 +70,14 @@ class ReadingSessionService
 
         $this->userBookModel->update($userBookId, $newStatus, $newCurrentPage);
 
+        $newBadges = $this->badgeService->checkAndAwardBadges($userId);
+
         return [
-            'message'       => 'Session enregistrée',
-            'session_id'    => $sessionId,
-            'current_page'  => $newCurrentPage,
-            'status'        => $newStatus,
+            'message'      => 'Session enregistrée',
+            'session_id'   => $sessionId,
+            'current_page' => $newCurrentPage,
+            'status'       => $newStatus,
+            'new_badges'   => $newBadges,
         ];
     }
 

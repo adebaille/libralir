@@ -12,6 +12,7 @@ use App\Controllers\BookController;
 use App\Controllers\LibraryController;
 use App\Controllers\ReadingSessionController;
 use App\Controllers\MonthlyChallengeController;
+use App\Controllers\BadgeController;
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: http://localhost:5173');
@@ -94,6 +95,10 @@ $router->put('/api/challenges/:id', function ($params) {
 
 $router->delete('/api/challenges/:id', function ($params) {
     (new MonthlyChallengeController())->delete($params);
+});
+
+$router->get('/api/badges', function () {
+    (new BadgeController())->list();
 });
 
 $router->dispatch(
