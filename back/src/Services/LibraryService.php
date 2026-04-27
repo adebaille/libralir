@@ -85,6 +85,7 @@ class LibraryService
             $filters['status']   ?? null,
             $filters['author']   ?? null,
             $filters['title']    ?? null,
+            $filters['category'] ?? null,
             $filters['order_by'] ?? 'created_at_desc'
         );
     }
