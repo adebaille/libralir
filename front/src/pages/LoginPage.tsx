@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import AuthLayout from "../components/AuthLayout";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -27,20 +28,32 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Connexion</h1>
+    <AuthLayout>
+      <header className="mb-6">
+        <h2 className="font-serif text-2xl mb-2">
+          Bon retour parmi nous
+        </h2>
+        <p className="text-sm text-gray-500">
+          Reprenez là où vous vous étiez arrêté.
+        </p>
+      </header>
 
-        {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
-            {error}
-          </div>
-        )}
+      {error && (
+        <p
+          className="bg-danger-100 text-danger-700 p-3 rounded-lg mb-4 text-sm"
+          role="alert"
+        >
+          {error}
+        </p>
+      )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <fieldset className="space-y-4 border-0 p-0 m-0">
+          <legend className="sr-only">Informations de connexion</legend>
+
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1">
-              Email
+            <label htmlFor="email" className="block text-xs font-medium text-gray-700 mb-1.5">
+              Adresse e-mail
             </label>
             <input
               id="email"
@@ -48,12 +61,14 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoComplete="email"
+              placeholder="vous@domaine.fr"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-1">
+            <label htmlFor="password" className="block text-xs font-medium text-gray-700 mb-1.5">
               Mot de passe
             </label>
             <input
@@ -62,26 +77,20 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoComplete="current-password"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             />
           </div>
+        </fieldset>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-          >
-            {isSubmitting ? "Connexion..." : "Se connecter"}
-          </button>
-        </form>
-
-        <p className="mt-4 text-center text-sm">
-          Pas encore de compte ?{" "}
-          <Link to="/register" className="text-blue-600 hover:underline">
-            S'inscrire
-          </Link>
-        </p>
-      </div>
-    </div>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium py-3 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? "Connexion..." : "Entrer dans la bibliothèque"}
+        </button>
+      </form>
+    </AuthLayout>
   );
 }

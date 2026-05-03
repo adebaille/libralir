@@ -1,1 +1,73 @@
+/* Polices avec les poids dont on a besoin */
+@import "@fontsource/fraunces/400.css";
+@import "@fontsource/fraunces/500.css";
+@import "@fontsource/fraunces/600.css";
+@import "@fontsource/fraunces/700.css";
+@import "@fontsource/fraunces/400-italic.css";
+
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+
 @import "tailwindcss";
+
+@theme {
+  /* Polices */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif: "Fraunces", Georgia, serif;
+
+  /* Couleurs principales */
+  --color-violet-50: #F5F3FF;
+  --color-violet-100: #EDE9FE;
+  --color-violet-200: #DDD6FE;
+  --color-violet-300: #C4B5FD;
+  --color-violet-400: #A78BFA;
+  --color-violet-500: #8B5CF6;
+  --color-violet-600: #7C3AED;
+  --color-violet-700: #6D28D9;
+  --color-violet-800: #5B21B6;
+  --color-violet-900: #4C1D95;
+
+  --color-gold-50: #FBF8F0;
+  --color-gold-100: #F5EBC8;
+  --color-gold-200: #EBD89C;
+  --color-gold-300: #DEC272;
+  --color-gold-400: #D4A53A;
+  --color-gold-500: #B88A2A;
+  --color-gold-600: #97701F;
+  --color-gold-700: #76570F;
+
+  /* Fonds */
+  --color-cream: #FAF8F3;
+  --color-ivory: #FCFAF7;
+
+  /* Couleurs sémantiques */
+  --color-success-100: #DCFCE7;
+  --color-success-600: #16A34A;
+  --color-success-700: #15803D;
+
+  --color-danger-100: #FEE2E2;
+  --color-danger-600: #DC2626;
+  --color-danger-700: #B91C1C;
+
+  --color-warning-100: #FEF3C7;
+  --color-warning-600: #D97706;
+  --color-warning-700: #B45309;
+
+  --color-info-100: #DBEAFE;
+  --color-info-600: #2563EB;
+  --color-info-700: #1D4ED8;
+}
+
+/* Style de base de l'app */
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-cream);
+  color: #1F1F2E;
+}
+
+/* Les titres en sérif par défaut */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+}
