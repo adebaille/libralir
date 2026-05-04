@@ -7,6 +7,7 @@ export default function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -16,6 +17,11 @@ export default function RegisterPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (displayName.trim().length < 2) {
+      setError("Le nom de lecteur doit contenir au moins 2 caractères");
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Les mots de passe ne correspondent pas");
@@ -30,7 +36,7 @@ export default function RegisterPage() {
     setIsSubmitting(true);
 
     try {
-      await register(email, password);
+      await register(email, password, displayName.trim());
       navigate("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur d'inscription");
@@ -59,6 +65,26 @@ export default function RegisterPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <fieldset className="space-y-4 border-0 p-0 m-0">
           <legend className="sr-only">Informations d'inscription</legend>
+
+          <div>
+            <label
+              htmlFor="displayName"
+              className="block text-xs font-medium text-gray-700 mb-1.5">
+              Nom de lecteur
+            </label>
+            <input
+              id="displayName"
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              required
+              minLength={2}
+              maxLength={50}
+              autoComplete="nickname"
+              placeholder="Lecteur Passionné"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+            />
+          </div>
 
           <div>
             <label
