@@ -16,7 +16,7 @@ export default function HomePage() {
           </button>
         </div>
 
-        <p>Connecté en tant que <strong>{user?.email}</strong></p>
+        <p>Connecté en tant que <strong>{user?.display_name}</strong></p>
       </div>
     </div>
   );
