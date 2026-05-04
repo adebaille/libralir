@@ -21,13 +21,17 @@ class AuthController
         // Récupère le corps de la requête JSON
         $data = json_decode(file_get_contents('php://input'), true);
 
-        if (empty($data['email']) || empty($data['password'])) {
+        if (empty($data['email']) || empty($data['password']) || empty($data['display_name'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'Email et mot de passe requis']);
+            echo json_encode(['error' => 'Email, mot de passe et nom de lecteur requis']);
             return;
         }
 
-        $result = $this->authService->register($data['email'], $data['password']);
+        $result = $this->authService->register(
+            $data['email'],
+            $data['password'],
+            $data['display_name']
+        );
 
         if (isset($result['error'])) {
             http_response_code(409);

@@ -23,21 +23,39 @@ class UserModel extends BaseModel
         $stmt->execute([':email' => $email]);
         return $stmt->fetch();
     }
+    
+// -------------------------------------------------------------------------
+    // FIND PROFILE BY ID
+    // Retourne les infos publiques d'un user (sans password_hash)
+    // Utilisé par GET /api/me et tout endpoint qui retourne le profil
+    // -------------------------------------------------------------------------
+    public function findProfileById(int $id): array|false
+    {
+        $stmt = $this->db->prepare(
+            'SELECT id, email, display_name, created_at 
+             FROM users 
+             WHERE id = :id'
+        );
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch();
+    }
 
     // -------------------------------------------------------------------------
     // CREATE
     // Insère un nouvel utilisateur avec un hash déjà préparé par AuthService
     // Le Model ne hash pas — il stocke simplement ce qu'on lui donne
     // -------------------------------------------------------------------------
-    public function create(string $email, string $passwordHash): bool
+    public function create(string $email, string $passwordHash, string $displayName): bool
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO users (email, password_hash) VALUES (:email, :password_hash)'
+            'INSERT INTO users (email, password_hash, display_name) 
+             VALUES (:email, :password_hash, :display_name)'
         );
 
         return $stmt->execute([
             ':email'         => $email,
             ':password_hash' => $passwordHash,
+            ':display_name'  => $displayName,
         ]);
     }
 
