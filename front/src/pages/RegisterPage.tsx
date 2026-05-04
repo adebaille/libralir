@@ -42,9 +42,7 @@ export default function RegisterPage() {
   return (
     <AuthLayout>
       <header className="mb-6">
-        <h2 className="font-serif text-2xl mb-2">
-          Bienvenue chez vous
-        </h2>
+        <h2 className="font-serif text-2xl mb-2">Bienvenue chez vous</h2>
         <p className="text-sm text-gray-500">
           Commencez votre carnet de lecture.
         </p>
@@ -53,8 +51,7 @@ export default function RegisterPage() {
       {error && (
         <p
           className="bg-danger-100 text-danger-700 p-3 rounded-lg mb-4 text-sm"
-          role="alert"
-        >
+          role="alert">
           {error}
         </p>
       )}
@@ -64,7 +61,9 @@ export default function RegisterPage() {
           <legend className="sr-only">Informations d'inscription</legend>
 
           <div>
-            <label htmlFor="email" className="block text-xs font-medium text-gray-700 mb-1.5">
+            <label
+              htmlFor="email"
+              className="block text-xs font-medium text-gray-700 mb-1.5">
               Adresse e-mail
             </label>
             <input
@@ -80,7 +79,9 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-xs font-medium text-gray-700 mb-1.5">
+            <label
+              htmlFor="password"
+              className="block text-xs font-medium text-gray-700 mb-1.5">
               Mot de passe
             </label>
             <input
@@ -95,7 +96,9 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-xs font-medium text-gray-700 mb-1.5">
+            <label
+              htmlFor="confirmPassword"
+              className="block text-xs font-medium text-gray-700 mb-1.5">
               Confirmer le mot de passe
             </label>
             <input
@@ -113,8 +116,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium py-3 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+          className="block mx-auto mt-6 bg-violet-500 hover:bg-violet-600 text-white text-sm font-medium px-8 py-3 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           {isSubmitting ? "Inscription..." : "Créer mon compte"}
         </button>
       </form>

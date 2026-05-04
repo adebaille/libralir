@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
+import { GiSpellBook } from "react-icons/gi";
 
 // Layout partagé pour les pages Login et Register
 // Affiche le panneau gauche avec dégradé violet/or, et le formulaire à droite
@@ -10,21 +11,24 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <main className="min-h-screen flex items-center justify-center bg-cream p-4">
       <article className="w-full max-w-5xl bg-white rounded-2xl shadow-lg overflow-hidden grid md:grid-cols-2">
-        
         {/* Panneau gauche : présentation de la marque */}
         <aside className="hidden md:flex flex-col justify-between min-h-150 p-12 bg-linear-to-br from-violet-600 via-violet-500 to-gold-400 text-white">
           <header>
-            <p className="flex items-center gap-2 mb-12 font-serif text-xl">
-              <span aria-hidden="true">📖</span>
+            <p className="flex items-baseline gap-3 mb-12 font-serif text-xl">
+              <GiSpellBook
+                className="text-4xl shrink-0 translate-y-1"
+                aria-hidden="true"
+              />
               <span>LibrAlir</span>
             </p>
-            
+
             <h1 className="font-serif italic text-4xl leading-snug mb-6">
               Une bibliothèque qui se souvient de vous.
             </h1>
-            
+
             <p className="text-sm leading-relaxed">
-              Suivez votre progression, gagnez des badges, relevez des défis mensuels — sans jamais perdre le plaisir de tourner les pages.
+              Suivez votre progression, gagnez des badges, relevez des défis
+              mensuels — sans jamais perdre le plaisir de tourner les pages.
             </p>
           </header>
 
@@ -37,9 +41,10 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
         {/* Section formulaire */}
         <section className="p-8 md:p-12 flex flex-col justify-center">
-          
           {/* Navigation entre Connexion et Inscription */}
-          <nav className="bg-cream rounded-full p-1 mb-8 grid grid-cols-2 max-w-md mx-auto w-full" aria-label="Choix entre connexion et inscription">
+          <nav
+            className="bg-cream rounded-full p-1 mb-8 grid grid-cols-2 max-w-md mx-auto w-full"
+            aria-label="Choix entre connexion et inscription">
             <Link
               to="/login"
               className={`text-center py-2 rounded-full text-sm font-medium transition-colors ${
@@ -47,8 +52,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                   ? "bg-white shadow-sm text-violet-700"
                   : "text-gray-600 hover:text-gray-900"
               }`}
-              aria-current={isLogin ? "page" : undefined}
-            >
+              aria-current={isLogin ? "page" : undefined}>
               Connexion
             </Link>
             <Link
@@ -58,8 +62,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                   ? "bg-white shadow-sm text-violet-700"
                   : "text-gray-600 hover:text-gray-900"
               }`}
-              aria-current={!isLogin ? "page" : undefined}
-            >
+              aria-current={!isLogin ? "page" : undefined}>
               Inscription
             </Link>
           </nav>

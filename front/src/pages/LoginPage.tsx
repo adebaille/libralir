@@ -30,9 +30,7 @@ export default function LoginPage() {
   return (
     <AuthLayout>
       <header className="mb-6">
-        <h2 className="font-serif text-2xl mb-2">
-          Bon retour parmi nous
-        </h2>
+        <h2 className="font-serif text-2xl mb-2">Bon retour parmi nous</h2>
         <p className="text-sm text-gray-500">
           Reprenez là où vous vous étiez arrêté.
         </p>
@@ -41,8 +39,7 @@ export default function LoginPage() {
       {error && (
         <p
           className="bg-danger-100 text-danger-700 p-3 rounded-lg mb-4 text-sm"
-          role="alert"
-        >
+          role="alert">
           {error}
         </p>
       )}
@@ -52,7 +49,9 @@ export default function LoginPage() {
           <legend className="sr-only">Informations de connexion</legend>
 
           <div>
-            <label htmlFor="email" className="block text-xs font-medium text-gray-700 mb-1.5">
+            <label
+              htmlFor="email"
+              className="block text-xs font-medium text-gray-700 mb-1.5">
               Adresse e-mail
             </label>
             <input
@@ -68,7 +67,9 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-xs font-medium text-gray-700 mb-1.5">
+            <label
+              htmlFor="password"
+              className="block text-xs font-medium text-gray-700 mb-1.5">
               Mot de passe
             </label>
             <input
@@ -86,8 +87,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium py-3 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+          className="block mx-auto mt-6 bg-violet-500 hover:bg-violet-600 text-white text-sm font-medium px-8 py-3 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           {isSubmitting ? "Connexion..." : "Entrer dans la bibliothèque"}
         </button>
       </form>
