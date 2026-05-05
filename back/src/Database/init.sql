@@ -5,14 +5,18 @@
 
 -- 1. USERS
 CREATE TABLE users (
-    id            INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    email         VARCHAR(255) NOT NULL,
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    display_name  VARCHAR(50)  NOT NULL,
-    created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    display_name VARCHAR(50) NOT NULL,
+    yearly_goal_books INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uq_users_email UNIQUE (email),
-    CONSTRAINT chk_users_display_name_length CHECK (LENGTH(TRIM(display_name)) BETWEEN 2 AND 50)
+    CONSTRAINT chk_users_display_name_length 
+        CHECK (LENGTH(TRIM(display_name)) BETWEEN 2 AND 50),
+    CONSTRAINT chk_users_yearly_goal_books_positive 
+        CHECK (yearly_goal_books >= 0)
 );
 
 -- 2. BOOKS (catalogue partagé, aucun propriétaire)
@@ -49,13 +53,14 @@ CREATE TABLE book_categories (
 
 -- 5. USER_BOOKS (relation utilisateur <-> livre : progression, statut)
 CREATE TABLE user_books (
-    id           INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id      INT NOT NULL,
-    book_id      INT NOT NULL,
-    status       VARCHAR(20) NOT NULL DEFAULT 'to_read',
-    current_page INT NOT NULL DEFAULT 0,
-    created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id            INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id       INT NOT NULL,
+    book_id       INT NOT NULL,
+    status        VARCHAR(20) NOT NULL DEFAULT 'to_read',
+    current_page  INT NOT NULL DEFAULT 0,
+    completed_at  TIMESTAMP NULL,
+    created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uq_user_books_user_book UNIQUE (user_id, book_id),
     CONSTRAINT chk_user_books_status CHECK (
         status IN ('to_read', 'in_progress', 'completed', 'paused', 'abandoned')

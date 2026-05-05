@@ -31,4 +31,24 @@ class UserService
 
         return $user;
     }
+
+    // -------------------------------------------------------------------------
+    // UPDATE YEARLY GOAL
+    // Met à jour l'objectif annuel de livres
+    // Validation : doit être un entier positif (0 = pas d'objectif fixé)
+    // -------------------------------------------------------------------------
+    public function updateYearlyGoal(int $userId, int $yearlyGoalBooks): array
+    {
+        if ($yearlyGoalBooks < 0) {
+            return ['error' => 'L\'objectif doit être un nombre positif'];
+        }
+
+        $success = $this->userModel->updateYearlyGoal($userId, $yearlyGoalBooks);
+
+        if (!$success) {
+            return ['error' => 'Erreur lors de la mise à jour de l\'objectif'];
+        }
+
+        return ['message' => 'Objectif mis à jour'];
+    }
 }

@@ -47,6 +47,10 @@ $router->get('/api/me', function () {
     (new UserController())->me();
 });
 
+$router->put('/api/me/yearly-goal', function () {
+    (new UserController())->updateYearlyGoal();
+});
+
 $router->get('/api/books/search', function () {
     (new BookController())->search();
 });

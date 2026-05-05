@@ -23,8 +23,8 @@ class UserModel extends BaseModel
         $stmt->execute([':email' => $email]);
         return $stmt->fetch();
     }
-    
-// -------------------------------------------------------------------------
+
+    // -------------------------------------------------------------------------
     // FIND PROFILE BY ID
     // Retourne les infos publiques d'un user (sans password_hash)
     // Utilisé par GET /api/me et tout endpoint qui retourne le profil
@@ -32,12 +32,31 @@ class UserModel extends BaseModel
     public function findProfileById(int $id): array|false
     {
         $stmt = $this->db->prepare(
-            'SELECT id, email, display_name, created_at 
-             FROM users 
-             WHERE id = :id'
+            'SELECT id, email, display_name, yearly_goal_books, created_at 
+         FROM users 
+         WHERE id = :id'
         );
         $stmt->execute([':id' => $id]);
         return $stmt->fetch();
+    }
+
+    // -------------------------------------------------------------------------
+    // UPDATE YEARLY GOAL
+    // Met à jour l'objectif annuel de livres pour un user
+    // -------------------------------------------------------------------------
+    public function updateYearlyGoal(int $id, int $yearlyGoalBooks): bool
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE users 
+             SET yearly_goal_books = :yearly_goal_books, 
+                 updated_at = CURRENT_TIMESTAMP 
+             WHERE id = :id'
+        );
+
+        return $stmt->execute([
+            ':id'                => $id,
+            ':yearly_goal_books' => $yearlyGoalBooks,
+        ]);
     }
 
     // -------------------------------------------------------------------------
@@ -53,9 +72,9 @@ class UserModel extends BaseModel
         );
 
         return $stmt->execute([
-            ':email'         => $email,
+            ':email' => $email,
             ':password_hash' => $passwordHash,
-            ':display_name'  => $displayName,
+            ':display_name' => $displayName,
         ]);
     }
 
