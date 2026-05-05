@@ -6,8 +6,10 @@ import { api } from "../services/api";
 
 // Type de l'utilisateur connecté
 type User = {
-  user_id: number;
+  id: number;
   email: string;
+  display_name: string;
+  created_at: string;
 };
 
 // Type de la valeur exposée par le contexte
@@ -15,7 +17,7 @@ type AuthContextValue = {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, displayName: string) => Promise<void>;
   logout: () => void;
 };
 
@@ -59,11 +61,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
   }
 
-  async function register(email: string, password: string) {
-    await api.post("/auth/register", { email, password });
-    // Auto-login après inscription
-    await login(email, password);
-  }
+  async function register(email: string, password: string, displayName: string) {
+  await api.post("/auth/register", {
+    email,
+    password,
+    display_name: displayName,
+  });
+  // Auto-login après inscription
+  await login(email, password);
+}
 
   function logout() {
     localStorage.removeItem("token");

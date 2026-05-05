@@ -14,6 +14,7 @@ use App\Controllers\ReadingSessionController;
 use App\Controllers\MonthlyChallengeController;
 use App\Controllers\BadgeController;
 use App\Controllers\RecommendationController;
+use App\Controllers\UserController;
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: http://localhost:5173');
@@ -43,11 +44,7 @@ $router->post('/api/auth/login', function () {
 });
 
 $router->get('/api/me', function () {
-    $user = AuthMiddleware::check();
-    echo json_encode([
-        'user_id' => $user['user_id'],
-        'email'   => $user['email'],
-    ]);
+    (new UserController())->me();
 });
 
 $router->get('/api/books/search', function () {

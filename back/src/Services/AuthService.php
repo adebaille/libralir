@@ -19,15 +19,25 @@ class AuthService
         $this->jwtSecret = $_ENV['JWT_SECRET'] ?? 'default_secret';
     }
 
-    // Inscription : vérifie l'unicité de l'email, hash le mot de passe, crée l'utilisateur
-    public function register(string $email, string $password): array
+    // Inscription : valide les données, vérifie l'unicité de l'email, 
+    // hash le mot de passe, crée l'utilisateur
+    public function register(string $email, string $password, string $displayName): array
     {
+        // Validation du display_name (longueur après trim)
+        $displayName = trim($displayName);
+        $length      = mb_strlen($displayName);
+
+        if ($length < 2 || $length > 50) {
+            return ['error' => 'Le nom de lecteur doit contenir entre 2 et 50 caractères'];
+        }
+
+        // Validation unicité email
         if ($this->userModel->findByEmail($email)) {
             return ['error' => 'Cet email est déjà utilisé'];
         }
 
         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
-        $this->userModel->create($email, $passwordHash);
+        $this->userModel->create($email, $passwordHash, $displayName);
 
         return ['message' => 'Inscription réussie'];
     }

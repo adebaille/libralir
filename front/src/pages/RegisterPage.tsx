@@ -1,11 +1,13 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import AuthLayout from "../components/AuthLayout";
 
 export default function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -15,6 +17,11 @@ export default function RegisterPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (displayName.trim().length < 2) {
+      setError("Le nom de lecteur doit contenir au moins 2 caractères");
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Les mots de passe ne correspondent pas");
@@ -29,7 +36,7 @@ export default function RegisterPage() {
     setIsSubmitting(true);
 
     try {
-      await register(email, password);
+      await register(email, password, displayName.trim());
       navigate("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur d'inscription");
@@ -39,20 +46,51 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Inscription</h1>
+    <AuthLayout>
+      <header className="mb-6">
+        <h2 className="font-serif text-2xl mb-2">Bienvenue chez vous</h2>
+        <p className="text-sm text-gray-500">
+          Commencez votre carnet de lecture.
+        </p>
+      </header>
 
-        {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
-            {error}
-          </div>
-        )}
+      {error && (
+        <p
+          className="bg-danger-100 text-danger-700 p-3 rounded-lg mb-4 text-sm"
+          role="alert">
+          {error}
+        </p>
+      )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <fieldset className="space-y-4 border-0 p-0 m-0">
+          <legend className="sr-only">Informations d'inscription</legend>
+
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1">
-              Email
+            <label
+              htmlFor="displayName"
+              className="block text-xs font-medium text-gray-700 mb-1.5">
+              Nom de lecteur
+            </label>
+            <input
+              id="displayName"
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              required
+              minLength={2}
+              maxLength={50}
+              autoComplete="nickname"
+              placeholder="Lecteur Passionné"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-xs font-medium text-gray-700 mb-1.5">
+              Adresse e-mail
             </label>
             <input
               id="email"
@@ -60,12 +98,16 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoComplete="email"
+              placeholder="vous@domaine.fr"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-1">
+            <label
+              htmlFor="password"
+              className="block text-xs font-medium text-gray-700 mb-1.5">
               Mot de passe
             </label>
             <input
@@ -74,12 +116,15 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoComplete="new-password"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             />
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
+            <label
+              htmlFor="confirmPassword"
+              className="block text-xs font-medium text-gray-700 mb-1.5">
               Confirmer le mot de passe
             </label>
             <input
@@ -88,26 +133,19 @@ export default function RegisterPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoComplete="new-password"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             />
           </div>
+        </fieldset>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-          >
-            {isSubmitting ? "Inscription..." : "S'inscrire"}
-          </button>
-        </form>
-
-        <p className="mt-4 text-center text-sm">
-          Déjà un compte ?{" "}
-          <Link to="/login" className="text-blue-600 hover:underline">
-            Se connecter
-          </Link>
-        </p>
-      </div>
-    </div>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="block mx-auto mt-6 bg-violet-500 hover:bg-violet-600 text-white text-sm font-medium px-8 py-3 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          {isSubmitting ? "Inscription..." : "Créer mon compte"}
+        </button>
+      </form>
+    </AuthLayout>
   );
 }
