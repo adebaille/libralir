@@ -68,7 +68,18 @@ class ReadingSessionService
             ? 'completed'
             : 'in_progress';
 
-        $this->userBookModel->update($userBookId, $newStatus, $newCurrentPage);
+        // Gestion de completed_at selon les transitions de statut
+        $completedAt = $userBook['completed_at'] ?? null;
+
+        if ($newStatus === 'completed' && $userBook['status'] !== 'completed') {
+            // Passage à completed via une session → on enregistre la date
+            $completedAt = date('Y-m-d H:i:s');
+        } elseif ($newStatus !== 'completed' && $userBook['status'] === 'completed') {
+            // Cas improbable ici mais cohérent : on reset
+            $completedAt = null;
+        }
+
+        $this->userBookModel->update($userBookId, $newStatus, $newCurrentPage, $completedAt);
 
         $newBadges = $this->badgeService->checkAndAwardBadges($userId);
 
