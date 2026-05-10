@@ -13,6 +13,7 @@ export type LibraryBook = {
   user_book_id: number;
   status: BookStatus;
   current_page: number;
+  completed_at: string | null;
   created_at: string;
   book_id: number;
   title: string;
@@ -84,4 +85,18 @@ export const libraryApi = {
   // Ajoute un livre à la bibliothèque (Google Books ou manuel)
   addBook: (payload: AddBookFromGoogle | AddBookManual) =>
     api.post<{ message: string }>("/library", payload),
+
+  // Récupère un livre précis de la bibliothèque
+  getBook: async (userBookId: number) => {
+    const response = await api.get<{ book: LibraryBook }>(`/library/${userBookId}`);
+    return response.book;
+  },
+
+  // Met à jour le statut et/ou la progression
+  updateBook: (userBookId: number, payload: { status?: BookStatus; current_page?: number }) =>
+    api.put<{ message: string }>(`/library/${userBookId}`, payload),
+
+  // Retire un livre de la bibliothèque
+  deleteBook: (userBookId: number) =>
+    api.delete<{ message: string }>(`/library/${userBookId}`),
 };

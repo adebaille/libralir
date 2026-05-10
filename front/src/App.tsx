@@ -9,6 +9,7 @@ import MainLayout from "./components/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicOnlyRoute from "./components/PublicOnlyRoute";
 import AddBookPage from "./pages/AddBookPage";
+import BookDetailPage from "./pages/BookDetailPage";
 
 export default function App() {
   return (
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="/challenges" element={<ChallengesPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/library/add" element={<AddBookPage />} />
+          <Route path="/library/:id" element={<BookDetailPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
