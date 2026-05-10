@@ -15,6 +15,7 @@ use App\Controllers\MonthlyChallengeController;
 use App\Controllers\BadgeController;
 use App\Controllers\RecommendationController;
 use App\Controllers\UserController;
+use App\Controllers\StatsController;
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: http://localhost:5173');
@@ -45,6 +46,14 @@ $router->post('/api/auth/login', function () {
 
 $router->get('/api/me', function () {
     (new UserController())->me();
+});
+
+$router->put('/api/me/yearly-goal', function () {
+    (new UserController())->updateYearlyGoal();
+});
+
+$router->get('/api/stats/dashboard', function () {
+    (new StatsController())->dashboard();
 });
 
 $router->get('/api/books/search', function () {

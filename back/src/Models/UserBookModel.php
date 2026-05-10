@@ -160,6 +160,7 @@ class UserBookModel extends BaseModel
                 ub.id AS user_book_id,
                 ub.status,
                 ub.current_page,
+                ub.completed_at,
                 ub.created_at,
                 b.id AS book_id,
                 b.title,
@@ -194,14 +195,16 @@ class UserBookModel extends BaseModel
 
     // -------------------------------------------------------------------------
     // UPDATE
-    // Met à jour le statut et/ou la progression d'une lecture
+    // Met à jour le statut, la progression et la date de complétion
+    // $completedAt peut être NULL (livre non complété) ou un timestamp
     // -------------------------------------------------------------------------
-    public function update(int $userBookId, string $status, int $currentPage): bool
+    public function update(int $userBookId, string $status, int $currentPage, ?string $completedAt): bool
     {
         $stmt = $this->db->prepare('
             UPDATE user_books
             SET status       = :status,
                 current_page = :current_page,
+                completed_at = :completed_at,
                 updated_at   = CURRENT_TIMESTAMP
             WHERE id = :id
         ');
@@ -210,6 +213,7 @@ class UserBookModel extends BaseModel
             ':id'           => $userBookId,
             ':status'       => $status,
             ':current_page' => $currentPage,
+            ':completed_at' => $completedAt,
         ]);
     }
 

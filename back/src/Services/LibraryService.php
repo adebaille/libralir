@@ -110,6 +110,7 @@ class LibraryService
     }
 
     // Met à jour le statut et/ou la progression
+    // Gère automatiquement completed_at selon les transitions de statut
     public function updateBookInLibrary(int $userId, int $userBookId, array $data): array
     {
         $book = $this->userBookModel->findByIdAndUser($userBookId, $userId);
@@ -133,7 +134,19 @@ class LibraryService
             return ['error' => 'Page actuelle invalide'];
         }
 
-        $this->userBookModel->update($userBookId, $status, $currentPage);
+        // Gestion de completed_at selon les transitions de statut
+        $completedAt = $book['completed_at'] ?? null;
+
+        if ($status === 'completed' && $book['status'] !== 'completed') {
+            // Passage à completed → on enregistre la date
+            $completedAt = date('Y-m-d H:i:s');
+        } elseif ($status !== 'completed' && $book['status'] === 'completed') {
+            // L'user revient en arrière (relecture, erreur) → on reset
+            $completedAt = null;
+        }
+        // Sinon (transition completed → completed ou autre → autre) : on garde tel quel
+
+        $this->userBookModel->update($userBookId, $status, $currentPage, $completedAt);
         $newBadges = $this->badgeService->checkAndAwardBadges($userId);
 
         return [
