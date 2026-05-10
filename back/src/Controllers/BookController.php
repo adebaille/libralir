@@ -21,7 +21,7 @@ class BookController
 
     // Recherche de livres via Google Books
     // GET /api/books/search?q=harry+potter
-    public function search(): void
+   public function search(): void
     {
         $query = trim($_GET['q'] ?? '');
 

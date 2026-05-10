@@ -27,51 +27,65 @@ class LibraryService
         $this->badgeService = new BadgeService();
     }
 
-    // Ajoute un livre (issu de Google Books) à la bibliothèque d'un user
-    // $bookData = payload reçu du front (title, authors, page_count, google_books_id, etc.)
+    // Ajoute un livre à la bibliothèque d'un user
+    // Deux modes :
+    // - Google Books : payload contient google_books_id, on cherche dans le catalogue avant
+    // - Saisie manuelle : pas de google_books_id, on crée toujours une nouvelle entrée
     public function addBookToLibrary(int $userId, array $bookData): array
     {
-        // Validation minimale
-        if (empty($bookData['google_books_id']) || empty($bookData['title'])) {
-            return ['error' => 'Données du livre incomplètes'];
+        // Validation des champs communs aux deux modes
+        if (empty($bookData['title'])) {
+            return ['error' => 'Le titre est requis'];
         }
 
         if (empty($bookData['page_count']) || $bookData['page_count'] <= 0) {
             return ['error' => 'Nombre de pages invalide'];
         }
 
-        // Étape 1 : le livre existe-t-il déjà dans le catalogue ?
-        $book = $this->bookModel->findByGoogleBooksId($bookData['google_books_id']);
+        $googleBooksId = !empty($bookData['google_books_id'])
+            ? $bookData['google_books_id']
+            : null;
 
-        if (!$book) {
-            // Pas dans le catalogue : on l'ajoute
+        // Étape 1 : récupérer ou créer le livre dans le catalogue
+        $book = null;
+
+        if ($googleBooksId !== null) {
+            // Mode Google Books : on vérifie si le livre est déjà dans le catalogue
+            $book = $this->bookModel->findByGoogleBooksId($googleBooksId);
+        }
+
+        if ($book) {
+            $bookId = (int) $book['id'];
+        } else {
+            // Pas dans le catalogue (ou saisie manuelle) : on crée
             $author = isset($bookData['authors']) && is_array($bookData['authors'])
                 ? implode(', ', $bookData['authors'])
-                : null;
+                : ($bookData['author'] ?? null);
 
             $bookId = $this->bookModel->create(
                 $bookData['title'],
                 $author,
                 (int) $bookData['page_count'],
-                $bookData['google_books_id'],
+                $googleBooksId,
                 $bookData['isbn_13'] ?? null,
                 $bookData['thumbnail'] ?? null
             );
 
-            // Enregistrer les catégories (uniquement pour un livre nouvellement créé)
+            // Catégories (si fournies, typiquement par Google Books)
             if (!empty($bookData['categories']) && is_array($bookData['categories'])) {
                 foreach ($bookData['categories'] as $categoryName) {
                     $categoryId = $this->categoryModel->findOrCreate($categoryName);
                     $this->categoryModel->attachToBook($bookId, $categoryId);
                 }
             }
-        } else {
-            $bookId = (int) $book['id'];
         }
 
-        // Étape 2 : vérifier si l'user a déjà ce livre
-        if ($this->userBookModel->findByUserAndBook($userId, $bookId)) {
-            return ['error' => 'Ce livre est déjà dans votre bibliothèque'];
+        // Étape 2 : vérifier les doublons UNIQUEMENT pour les livres Google Books
+        // (pour la saisie manuelle, on accepte les doublons — décision V1)
+        if ($googleBooksId !== null) {
+            if ($this->userBookModel->findByUserAndBook($userId, $bookId)) {
+                return ['error' => 'Ce livre est déjà dans votre bibliothèque'];
+            }
         }
 
         // Étape 3 : ajouter à la bibliothèque
