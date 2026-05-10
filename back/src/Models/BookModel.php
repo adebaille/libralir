@@ -33,7 +33,7 @@ class BookModel extends BaseModel
         string $title,
         ?string $author,
         int $totalPages,
-        string $googleBooksId,
+        ?string $googleBooksId,
         ?string $isbn13,
         ?string $thumbnailUrl
     ): int {
