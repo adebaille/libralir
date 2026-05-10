@@ -31,6 +31,35 @@ export type LibraryFilters = {
   order_by?: string;
 };
 
+// Réponse d'un résultat de recherche Google Books
+export type SearchResultBook = {
+  google_books_id: string;
+  title: string;
+  authors: string[];
+  page_count: number | null;
+  isbn_13: string | null;
+  thumbnail: string | null;
+  categories: string[];
+};
+
+// Payload pour ajouter un livre via Google Books
+export type AddBookFromGoogle = {
+  google_books_id: string;
+  title: string;
+  authors: string[];
+  page_count: number;
+  isbn_13?: string | null;
+  thumbnail?: string | null;
+  categories?: string[];
+};
+
+// Payload pour ajouter un livre en saisie manuelle
+export type AddBookManual = {
+  title: string;
+  author?: string;
+  page_count: number;
+};
+
 export const libraryApi = {
   // Récupère la bibliothèque de l'user, avec filtres optionnels
  getLibrary: async (filters: LibraryFilters = {}) => {
@@ -43,4 +72,16 @@ export const libraryApi = {
     const response = await api.get<{ books: LibraryBook[] }>(`/library${query}`);
     return response.books;
   },
+
+  // Recherche dans Google Books
+  searchBooks: async (query: string) => {
+    const response = await api.get<{ books: SearchResultBook[] }>(
+      `/books/search?q=${encodeURIComponent(query)}`
+    );
+    return response.books;
+  },
+
+  // Ajoute un livre à la bibliothèque (Google Books ou manuel)
+  addBook: (payload: AddBookFromGoogle | AddBookManual) =>
+    api.post<{ message: string }>("/library", payload),
 };
