@@ -45,7 +45,6 @@ export default function LibraryPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setError(null);
 
     libraryApi
