@@ -70,11 +70,10 @@
   }
 }
 
+}
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
 }
-}
-
 /* Style de base de l'app */
 body {
   font-family: var(--font-sans);

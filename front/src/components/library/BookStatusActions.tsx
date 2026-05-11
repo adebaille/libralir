@@ -1,5 +1,6 @@
 import { LuPlay, LuCheck, LuPause, LuX, LuRotateCcw } from "react-icons/lu";
 import type { BookStatus } from "../../services/libraryApi";
+import { STATUS_LABELS } from "../../constants/bookStatus";
 
 type StatusAction = {
   label: string;
@@ -60,15 +61,6 @@ function getButtonClasses(variant: StatusAction["variant"]): string {
       return `${base} bg-white border border-red-200 text-red-700 hover:bg-red-50`;
   }
 }
-
-// Mapping statut → libellé pour l'affichage du badge
-const STATUS_LABELS: Record<BookStatus, string> = {
-  to_read:     "À lire",
-  in_progress: "En cours de lecture",
-  completed:   "Terminé",
-  paused:      "En pause",
-  abandoned:   "Abandonné",
-};
 
 export default function BookStatusActions({
   currentStatus,
