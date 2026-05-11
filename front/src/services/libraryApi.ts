@@ -24,12 +24,20 @@ export type LibraryBook = {
 };
 
 // Filtres optionnels pour la requête /api/library
+export type LibraryOrderBy =
+  | "created_at_desc"
+  | "created_at_asc"
+  | "title_asc"
+  | "title_desc"
+  | "author_asc"
+  | "author_desc";
+
 export type LibraryFilters = {
   status?: BookStatus;
   author?: string;
   title?: string;
   category?: string;
-  order_by?: string;
+  order_by?: LibraryOrderBy;
 };
 
 // Réponse d'un résultat de recherche Google Books
@@ -76,10 +84,15 @@ export const libraryApi = {
 
   // Recherche dans Google Books
   searchBooks: async (query: string) => {
-    const response = await api.get<{ books: SearchResultBook[] }>(
-      `/books/search?q=${encodeURIComponent(query)}`
+    const responseIsbn = await api.get<{ books: SearchResultBook[] }>(
+      `/books/search?q=isbn:${encodeURIComponent(query)}`
     );
-    return response.books;
+    
+    const resultIsbn = JSON.parse(JSON.stringify(responseIsbn.books));
+    const response = await api.get<{ books: SearchResultBook[] }>(
+      `/books/search?q=:${encodeURIComponent(query)}`
+    );
+    return (resultIsbn.length !== 0) ? resultIsbn : response.books;
   },
 
   // Ajoute un livre à la bibliothèque (Google Books ou manuel)
