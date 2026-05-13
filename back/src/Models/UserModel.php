@@ -60,6 +60,25 @@ class UserModel extends BaseModel
     }
 
     // -------------------------------------------------------------------------
+    // UPDATE DISPLAY NAME
+    // Met à jour le nom de lecteur d'un user
+    // -------------------------------------------------------------------------
+    public function updateDisplayName(int $id, string $displayName): bool
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE users 
+             SET display_name = :display_name, 
+                 updated_at = CURRENT_TIMESTAMP 
+             WHERE id = :id'
+        );
+
+        return $stmt->execute([
+            ':id'           => $id,
+            ':display_name' => $displayName,
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
     // CREATE
     // Insère un nouvel utilisateur avec un hash déjà préparé par AuthService
     // Le Model ne hash pas — il stocke simplement ce qu'on lui donne

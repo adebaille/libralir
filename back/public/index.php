@@ -52,6 +52,10 @@ $router->put('/api/me/yearly-goal', function () {
     (new UserController())->updateYearlyGoal();
 });
 
+$router->put('/api/me/display-name', function () {
+    (new UserController())->updateDisplayName();
+});
+
 $router->get('/api/stats/dashboard', function () {
     (new StatsController())->dashboard();
 });

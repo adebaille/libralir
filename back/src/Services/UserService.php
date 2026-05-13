@@ -51,4 +51,30 @@ class UserService
 
         return ['message' => 'Objectif mis à jour'];
     }
+
+    // -------------------------------------------------------------------------
+    // UPDATE DISPLAY NAME
+    // Met à jour le nom de lecteur
+    // Validation : 2-50 caractères après trim (cohérent avec l'inscription)
+    // -------------------------------------------------------------------------
+    public function updateDisplayName(int $userId, string $displayName): array
+    {
+        $displayName = trim($displayName);
+        $length      = mb_strlen($displayName);
+
+        if ($length < 2 || $length > 50) {
+            return ['error' => 'Le nom de lecteur doit contenir entre 2 et 50 caractères'];
+        }
+
+        $success = $this->userModel->updateDisplayName($userId, $displayName);
+
+        if (!$success) {
+            return ['error' => 'Erreur lors de la mise à jour du nom'];
+        }
+
+        return [
+            'message'      => 'Nom mis à jour',
+            'display_name' => $displayName,
+        ];
+    }
 }
