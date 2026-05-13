@@ -82,17 +82,12 @@ export const libraryApi = {
     return response.books;
   },
 
-  // Recherche dans Google Books
+  // Recherche dans Google Books par titre ou auteur
   searchBooks: async (query: string) => {
-    const responseIsbn = await api.get<{ books: SearchResultBook[] }>(
-      `/books/search?q=isbn:${encodeURIComponent(query)}`
-    );
-    
-    const resultIsbn = JSON.parse(JSON.stringify(responseIsbn.books));
     const response = await api.get<{ books: SearchResultBook[] }>(
-      `/books/search?q=:${encodeURIComponent(query)}`
+      `/books/search?q=${encodeURIComponent(query.trim())}`
     );
-    return (resultIsbn.length !== 0) ? resultIsbn : response.books;
+    return response.books;
   },
 
   // Ajoute un livre à la bibliothèque (Google Books ou manuel)
