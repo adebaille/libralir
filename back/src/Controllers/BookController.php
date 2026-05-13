@@ -31,8 +31,12 @@ class BookController
             return;
         }
 
-        $books = $this->googleBooksService->search($query);
-
-        echo json_encode(['books' => $books]);
+        try {
+            $books = $this->googleBooksService->search($query);
+            echo json_encode(['books' => $books]);
+        } catch (\RuntimeException $e) {
+            http_response_code(503);
+            echo json_encode(['error' => 'Service de recherche temporairement indisponible']);
+        }
     }
 }
