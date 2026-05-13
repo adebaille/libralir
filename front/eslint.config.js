@@ -19,5 +19,10 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Faux positifs récurrents sur des patterns valides de data fetching.
+      // À réactiver quand on migrera vers TanStack Query (cf. backlog V2).
+      'react-hooks/set-state-in-effect': 'off',
+    },
   },
 ])

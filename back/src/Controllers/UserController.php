@@ -55,4 +55,25 @@ class UserController
 
         echo json_encode($result);
     }
+
+    // Met à jour le nom de lecteur de l'utilisateur connecté
+    // PUT /api/me/display-name
+    public function updateDisplayName(): void
+    {
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        if (!is_array($data) || empty($data['display_name'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Champ display_name requis']);
+            return;
+        }
+
+        $result = $this->userService->updateDisplayName($this->userId, $data['display_name']);
+
+        if (isset($result['error'])) {
+            http_response_code(400);
+        }
+
+        echo json_encode($result);
+    }
 }
