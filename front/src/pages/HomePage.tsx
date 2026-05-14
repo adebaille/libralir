@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { statsApi, type DashboardStats } from "../services/statsApi";
 import { libraryApi, type LibraryBook } from "../services/libraryApi";
 import Greeting from "../components/dashboard/Greeting";
-import StreakPlaceholder from "../components/dashboard/StreakPlaceholder";
 import StatsGrid from "../components/dashboard/StatsGrid";
 import InProgressBooks from "../components/dashboard/InProgressBooks";
+import StreakDisplay from "../components/dashboard/StreakDisplay";
 
 export default function HomePage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -50,7 +50,7 @@ export default function HomePage() {
 
       {!isLoading && !error && stats && (
         <>
-          <StreakPlaceholder />
+          <StreakDisplay currentStreak={stats.current_streak} />
           <div className="mb-8">
             <StatsGrid stats={stats} />
           </div>
