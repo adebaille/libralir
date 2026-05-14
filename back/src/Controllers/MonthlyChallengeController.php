@@ -54,6 +54,14 @@ class MonthlyChallengeController
         echo json_encode(['challenges' => $challenges]);
     }
 
+    // Liste les défis passés de l'user (mois antérieurs au mois courant)
+    // GET /api/challenges/history
+    public function history(): void
+    {
+        $challenges = $this->challengeService->getHistory($this->userId);
+        echo json_encode(['challenges' => $challenges]);
+    }
+
     // Modifie l'objectif d'un défi
     // PUT /api/challenges/:id
     public function update(array $params): void
