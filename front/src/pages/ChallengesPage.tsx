@@ -13,7 +13,7 @@ import SuggestionCard, {
 import ChallengeHistoryItem from "../components/challenges/ChallengeHistoryItem";
 import OrnateSeparator from "../components/ui/OrnateSeparator";
 import CreateChallengeModal from "../components/challenges/CreateChallengeModal";
-import { getChallengeSuggestions } from "../constants/ChallengeSuggestions";
+import { getChallengeSuggestions } from "../constants/challengeSuggestions";
 
 export default function ChallengesPage() {
   // Mois et année courants
