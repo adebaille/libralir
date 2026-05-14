@@ -7,6 +7,7 @@ export type DashboardStats = {
   pages_read: number;
   minutes_read: number;
   yearly_goal_books: number;
+  current_streak: number;
 };
 
 export const statsApi = {

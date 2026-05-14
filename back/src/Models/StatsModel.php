@@ -61,4 +61,23 @@ class StatsModel
             'minutes_read' => (int) $sessionsRow['minutes_read'],
         ];
     }
+
+    // -------------------------------------------------------------------------
+    // GET READING DATES
+    // Retourne toutes les dates distinctes où l'user a au moins une session
+    // Triées par date décroissante (plus récente en premier)
+    // -------------------------------------------------------------------------
+    public function getReadingDates(int $userId): array
+    {
+        $stmt = $this->db->prepare('
+            SELECT DISTINCT rs.session_date
+            FROM reading_sessions rs
+            INNER JOIN user_books ub ON ub.id = rs.user_book_id
+            WHERE ub.user_id = :user_id
+            ORDER BY rs.session_date DESC
+        ');
+        $stmt->execute([':user_id' => $userId]);
+
+        return $stmt->fetchAll(\PDO::FETCH_COLUMN);
+    }
 }
