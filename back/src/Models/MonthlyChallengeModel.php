@@ -109,6 +109,27 @@ class MonthlyChallengeModel extends BaseModel
     }
 
     // -------------------------------------------------------------------------
+    // FIND HISTORY BY USER
+    // Récupère les défis des mois passés (exclut le mois courant)
+    // Le mois courant est affiché dans la card principale, pas dans l'historique
+    // -------------------------------------------------------------------------
+    public function findHistoryByUser(int $userId, int $currentMonth, int $currentYear): array
+    {
+        $stmt = $this->db->prepare('
+            SELECT * FROM user_monthly_challenges
+            WHERE user_id = :user_id
+              AND (year < :current_year OR (year = :current_year AND month < :current_month))
+            ORDER BY year DESC, month DESC, challenge_type
+        ');
+        $stmt->execute([
+            ':user_id'       => $userId,
+            ':current_year'  => $currentYear,
+            ':current_month' => $currentMonth,
+        ]);
+        return $stmt->fetchAll();
+    }
+
+    // -------------------------------------------------------------------------
     // DELETE
     // Supprime un défi
     // -------------------------------------------------------------------------

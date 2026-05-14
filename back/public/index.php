@@ -100,6 +100,10 @@ $router->delete('/api/account', function () {
     (new AuthController())->deleteAccount();
 });
 
+$router->get('/api/challenges/history', function () {
+    (new MonthlyChallengeController())->history();
+});
+
 $router->post('/api/challenges', function () {
     (new MonthlyChallengeController())->create();
 });

@@ -77,6 +77,20 @@ class MonthlyChallengeService
         );
     }
 
+    // Récupère l'historique des défis passés avec progression et résultat
+    public function getHistory(int $userId): array
+    {
+        $currentMonth = (int) date('n');
+        $currentYear  = (int) date('Y');
+
+        $challenges = $this->challengeModel->findHistoryByUser($userId, $currentMonth, $currentYear);
+
+        return array_map(
+            fn($c) => $this->enrichWithProgress($c),
+            $challenges
+        );
+    }
+
     // Modifie l'objectif d'un défi
     public function updateChallenge(int $userId, int $challengeId, array $data): array
     {
@@ -120,7 +134,7 @@ class MonthlyChallengeService
         $currentValue = match ($challenge['challenge_type']) {
             'pages_read'      => $this->calculatePagesRead($challenge),
             'books_completed' => $this->calculateBooksCompleted($challenge),
-            'genres_read'     => 0, // à implémenter plus tard
+            'genres_read'     => $this->calculateGenresRead($challenge),
             default           => 0,
         };
 
@@ -150,7 +164,7 @@ class MonthlyChallengeService
         return (int) $stmt->fetchColumn();
     }
 
-    // Compte les livres passés à 'completed' dans le mois
+    // Compte les livres complétés dans le mois (basé sur completed_at)
     private function calculateBooksCompleted(array $challenge): int
     {
         $stmt = $this->pdo->prepare("
@@ -158,8 +172,31 @@ class MonthlyChallengeService
             FROM user_books
             WHERE user_id = :user_id
               AND status = 'completed'
-              AND EXTRACT(MONTH FROM updated_at) = :month
-              AND EXTRACT(YEAR FROM updated_at) = :year
+              AND completed_at IS NOT NULL
+              AND EXTRACT(MONTH FROM completed_at) = :month
+              AND EXTRACT(YEAR FROM completed_at) = :year
+        ");
+        $stmt->execute([
+            ':user_id' => $challenge['user_id'],
+            ':month'   => $challenge['month'],
+            ':year'    => $challenge['year'],
+        ]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    // Compte les catégories distinctes des livres complétés dans le mois
+    private function calculateGenresRead(array $challenge): int
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(DISTINCT bc.category_id) AS total
+            FROM user_books ub
+            INNER JOIN book_categories bc ON bc.book_id = ub.book_id
+            WHERE ub.user_id = :user_id
+              AND ub.status = 'completed'
+              AND ub.completed_at IS NOT NULL
+              AND EXTRACT(MONTH FROM ub.completed_at) = :month
+              AND EXTRACT(YEAR FROM ub.completed_at) = :year
         ");
         $stmt->execute([
             ':user_id' => $challenge['user_id'],
